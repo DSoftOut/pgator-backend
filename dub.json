@@ -8,9 +8,9 @@
        ,"Shamyan Roman (Zaramzan <shamyan.roman@gmail.com>)"
        ,"Denis Feklushkin <denis.feklushkin@gmail.com>"
        ],
-    "versions": ["VibeCustomMain", "Have_vibe_d", "Have_Int64_TimeStamp"],
+    "versions": ["Have_Int64_TimeStamp"],
     "dependencies": {
-        "vibe-d" : ">=0.7.21-beta.4",
+        "vibe-d" : { "version": ">=0.7.21-beta.4", "optional": true },
         "derelict-pq": ">=1.0.0",
         "dlogg": ">=0.3.3"
     },
