@@ -21,7 +21,33 @@ import std.conv;
 import core.memory;
 import core.exception: RangeError;
 
-//import util;
+/**
+ * Identifiers of error message fields.
+ *
+ * Source: /usr/include/postgresql/postgres_ext.h
+ *
+ * TODO: move it to DerelictPQ
+ */
+enum ErrorMsgFields : int
+{
+    PG_DIAG_SEVERITY	=	'S',
+    PG_DIAG_SQLSTATE	=	'C',
+    PG_DIAG_MESSAGE_PRIMARY='M',
+    PG_DIAG_MESSAGE_DETAIL= 'D',
+    PG_DIAG_MESSAGE_HINT=   'H',
+    PG_DIAG_STATEMENT_POSITION='P',
+    PG_DIAG_INTERNAL_POSITION='p',
+    PG_DIAG_INTERNAL_QUERY=	'q',
+    PG_DIAG_CONTEXT		=	'W',
+    PG_DIAG_SCHEMA_NAME	=	's',
+    PG_DIAG_TABLE_NAME	=	't',
+    PG_DIAG_COLUMN_NAME	=	'c',
+    PG_DIAG_DATATYPE_NAME=	'd',
+    PG_DIAG_CONSTRAINT_NAME='n',
+    PG_DIAG_SOURCE_FILE	=	'F',
+    PG_DIAG_SOURCE_LINE	=	'L',
+    PG_DIAG_SOURCE_FUNCTION='R'
+}
 
 synchronized class CPGresult : IPGresult
 {
@@ -88,6 +114,20 @@ synchronized class CPGresult : IPGresult
     body
     {
         return fromStringz(PQresultErrorMessage(result)).idup;
+    }
+
+    /**
+    *   Prototype: PQresultErrorField
+    */
+    string resultErrorField(ErrorMsgFields fieldcode)
+    in
+    {
+        assert(result !is null, "PGconn was finished!");
+        assert(PQresultErrorField !is null, "DerelictPQ isn't loaded!");
+    }
+    body
+    {
+        return fromStringz(PQresultErrorField(result, fieldcode)).idup;
     }
     
     /**
