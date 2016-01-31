@@ -24,10 +24,22 @@ struct Respond
     *   at its own level. $(B collect) method handles other
     *   cases.
     */
+    this(SQLFailException e, shared IConnection conn)
+    {
+        scope(exit) conn.clearRaisedMsgs;
+
+        failed = true;
+        SQLfailed = true;
+        errorDetails = e.details;
+        exception = errorDetails.message;
+        msgs = conn.raisedMsgs.array.idup;
+    }
+
+    /// ditto
     this(QueryException e, shared IConnection conn)
     {
         scope(exit) conn.clearRaisedMsgs;
-        
+
         failed = true;
         exception = e.msg;
         msgs = conn.raisedMsgs.array.idup;
@@ -87,10 +99,16 @@ struct Respond
         foreach(col; columns) return col.length == 1;
         return false;
     }
-    
+
     /// Flag to distinct error case from normal respond
     bool failed = false;
-    
+
+    /// Flag to distinct SQL syntax or exec error case from normal respond
+    bool SQLfailed = false;
+
+    /// Only for SQL and syntax error messages
+    PGQueryException.ErrorDetails errorDetails;
+
     bool onRowConstaintFailed = false;
     size_t constraintFailQueryId;
     

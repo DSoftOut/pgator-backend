@@ -60,10 +60,17 @@ class PGReconnectException : PGException
 */
 class PGQueryException : PGException
 {
-    string message;
-    string detail;
-    string hint;
-    string errcode;
+    struct ErrorDetails
+    {
+        string message;
+        string detail;
+        string hint;
+        string errcode;
+    }
+
+    ErrorDetails details;
+
+    alias details this;
 
     this(shared const IPGresult result, string file = __FILE__, size_t line = __LINE__)
     {
