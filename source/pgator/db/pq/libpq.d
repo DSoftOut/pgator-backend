@@ -119,7 +119,7 @@ synchronized class CPGresult : IPGresult
     /**
     *   Prototype: PQresultErrorField
     */
-    string resultErrorField(ErrorMsgFields fieldcode)
+    string resultErrorField(ErrorMsgFields fieldcode) const
     in
     {
         assert(result !is null, "PGconn was finished!");

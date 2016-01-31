@@ -61,7 +61,7 @@ class SQLFailException : QueryException
     string hint;
     string errcode;
 
-    @safe pure nothrow this(IPGresult result, string file = __FILE__, size_t line = __LINE__)
+    this(shared IPGresult result, string file = __FILE__, size_t line = __LINE__)
     {
         string msg = result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_PRIMARY);
         super("SQL query failed, reason: " ~ msg, file, line);

@@ -126,7 +126,7 @@ interface IPGresult
     /**
     *   Prototype: PQresultErrorField
     */
-    string resultErrorField(ErrorMsgFields fieldcode);
+    string resultErrorField(ErrorMsgFields fieldcode) const;
     
     /**
     *   Prototype: PQclear
