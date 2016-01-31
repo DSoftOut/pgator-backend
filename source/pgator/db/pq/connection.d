@@ -155,7 +155,7 @@ synchronized class PQConnection : IConnection
     
     /**
     *   Initializes querying process in non-blocking manner.
-    *   Throws: QueryException
+    *   Throws: SQLFailException
     */
     void postQuery(string com, string[] params = [])
     in
