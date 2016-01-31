@@ -517,7 +517,7 @@ synchronized class CPGconn : IPGconn
             , toPlainArray(paramValues), null, null, 1);
         if (res == 0)
         {
-            throw new PGQueryException(errorMessage);
+            throw new PGQueryException(getResult);
         }
     }
     
@@ -536,7 +536,7 @@ synchronized class CPGconn : IPGconn
         auto res = PQsendQuery(conn, command.toStringz);
         if (res == 0)
         {
-            throw new PGQueryException(errorMessage);
+            throw new PGQueryException(getResult);
         }
     }
     
@@ -556,7 +556,7 @@ synchronized class CPGconn : IPGconn
         }
         catch(PGEscapeException e)
         {
-            throw new PGQueryException(e.msg);
+            throw new PGQueryException(getResult);
         }
     }
     
@@ -595,7 +595,7 @@ synchronized class CPGconn : IPGconn
     {
         auto res = PQconsumeInput(conn);
         if(res == 0) 
-            throw new PGQueryException(errorMessage);
+            throw new PGQueryException(getResult);
     }
     
     /**

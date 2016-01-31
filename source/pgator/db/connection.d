@@ -64,6 +64,11 @@ class SQLFailException : QueryException
     this(shared IPGresult result, string file = __FILE__, size_t line = __LINE__)
     {
         string msg = result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_PRIMARY);
+
+        detail =    result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_DETAIL);
+        hint =      result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_HINT);
+        errcode =   result.resultErrorField(ErrorMsgFields.PG_DIAG_SQLSTATE);
+
         super("SQL query failed, reason: " ~ msg, file, line);
     }
 }

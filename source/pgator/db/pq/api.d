@@ -60,9 +60,19 @@ class PGReconnectException : PGException
 */
 class PGQueryException : PGException
 {
-    @safe pure nothrow this(string msg, string file = __FILE__, size_t line = __LINE__)
+    string message;
+    string detail;
+    string hint;
+    string errcode;
+
+    this(shared const IPGresult result, string file = __FILE__, size_t line = __LINE__)
     {
-        super(msg, file, line); 
+        message =   result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_PRIMARY);
+        detail =    result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_DETAIL);
+        hint =      result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_HINT);
+        errcode =   result.resultErrorField(ErrorMsgFields.PG_DIAG_SQLSTATE);
+
+        super(message, file, line); 
     }
 }
 
