@@ -167,7 +167,7 @@ synchronized class PQConnection : IConnection
         try conn.sendQueryParams(com, params);
         catch (PGQueryException e)
         {
-            throw new QueryException(e.msg);
+            throw new SQLFailException(e);
         }
     }
     
