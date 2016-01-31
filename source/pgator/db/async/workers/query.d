@@ -328,6 +328,13 @@ private class Element
                         }
                         stage = Stage.MoreQueries;
                     }
+                    catch(SQLFailException e)
+                    {
+                        respond = Respond(e, conn);
+                        rollbackNeeded = true;
+                        stage = Stage.MoreQueries;
+                        return;
+                    }
                     catch(QueryException e)
                     {
                         respond = Respond(e, conn);
