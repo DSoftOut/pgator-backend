@@ -12,6 +12,7 @@ import pgator.db.pq.api;
 import std.container;
 import std.datetime;
 import std.range;
+import pgator.db.pq.libpq: ErrorMsgFields;
 
 /**
 *    The exception is thrown when connection attempt to SQL server is failed due some reason.
@@ -48,6 +49,22 @@ class QueryException : Exception
     @safe pure nothrow this(string msg, string file = __FILE__, size_t line = __LINE__)
     {
         super("Query to SQL server is failed, reason: " ~ msg, file, line); 
+    }
+}
+
+/**
+*   The exception is thrown when query is failed due reason like SQL syntax error or query error.
+*/
+class SQLFailException : QueryException
+{
+    string detail;
+    string hint;
+    string errcode;
+
+    @safe pure nothrow this(IPGresult result, string file = __FILE__, size_t line = __LINE__)
+    {
+        string msg = result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_PRIMARY);
+        super("SQL query failed, reason: " ~ msg, file, line);
     }
 }
 

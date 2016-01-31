@@ -17,6 +17,7 @@ module pgator.db.pq.api;
 import derelict.pq.pq;
 public import pgator.db.pq.types.oids;
 import pgator.db.connection;
+import pgator.db.pq.libpq; // TODO: remove it after moving ErrorMsgFields to DerelictPQ
 import pgator.db.pq.types.conv;
 import vibe.data.bson;
 import dlogg.log;
@@ -121,6 +122,11 @@ interface IPGresult
     *   Prototype: PQresultErrorMessage
     */
     string resultErrorMessage() const;
+
+    /**
+    *   Prototype: PQresultErrorField
+    */
+    string resultErrorField(ErrorMsgFields fieldcode);
     
     /**
     *   Prototype: PQclear
