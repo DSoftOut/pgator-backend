@@ -17,7 +17,6 @@ module pgator.db.pq.api;
 import derelict.pq.pq;
 public import pgator.db.pq.types.oids;
 import pgator.db.connection;
-import pgator.db.pq.libpq; // TODO: remove it after moving ErrorMsgFields to DerelictPQ
 import pgator.db.pq.types.conv;
 import vibe.data.bson;
 import dlogg.log;
@@ -74,10 +73,10 @@ class PGQueryException : PGException
 
     this(shared const IPGresult result, string file = __FILE__, size_t line = __LINE__)
     {
-        message =   result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_PRIMARY);
-        detail =    result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_DETAIL);
-        hint =      result.resultErrorField(ErrorMsgFields.PG_DIAG_MESSAGE_HINT);
-        errcode =   result.resultErrorField(ErrorMsgFields.PG_DIAG_SQLSTATE);
+        message =   result.resultErrorField(PG_DIAG_MESSAGE_PRIMARY);
+        detail =    result.resultErrorField(PG_DIAG_MESSAGE_DETAIL);
+        hint =      result.resultErrorField(PG_DIAG_MESSAGE_HINT);
+        errcode =   result.resultErrorField(PG_DIAG_SQLSTATE);
 
         super(message, file, line); 
     }
@@ -143,7 +142,7 @@ interface IPGresult
     /**
     *   Prototype: PQresultErrorField
     */
-    string resultErrorField(ErrorMsgFields fieldcode) const;
+    string resultErrorField(int fieldcode) const;
     
     /**
     *   Prototype: PQclear

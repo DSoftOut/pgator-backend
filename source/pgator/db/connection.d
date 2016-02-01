@@ -12,7 +12,6 @@ import pgator.db.pq.api;
 import std.container;
 import std.datetime;
 import std.range;
-import pgator.db.pq.libpq: ErrorMsgFields;
 
 /**
 *    The exception is thrown when connection attempt to SQL server is failed due some reason.
