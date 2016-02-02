@@ -42,13 +42,12 @@ class UnknownTransactionException : Exception
     }
 }
 
-/**
-*   The exception is thrown when something bad has happen while 
-*   query passing to server or loading from server. This exception
-*   has no bearing on the SQL errors.
-*/
 class QueryProcessingException : Exception
 {
+    PGQueryException.ErrorDetails errorDetails;
+
+    alias errorDetails this;
+
     @safe pure nothrow this(string msg, string file = __FILE__, size_t line = __LINE__)
     {
         super(msg, file, line); 
