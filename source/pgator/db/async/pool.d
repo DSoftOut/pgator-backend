@@ -292,7 +292,7 @@ class AsyncPool : IConnectionPool
                     logger.logError(respond.exception);
 
                     auto e = new QueryProcessingException(respond.exception);
-                    if(respond.SQLfailed) e.errorDetails = respond.errorDetails;
+                    if(respond.SQLfailed) e.errDetails = respond.errorDetails;
 
                     throw e;
                 }
