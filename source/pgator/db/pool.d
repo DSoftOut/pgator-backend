@@ -44,7 +44,7 @@ class UnknownTransactionException : Exception
 
 class QueryProcessingException : Exception
 {
-    PGQueryException.ErrorDetails errorDetails;
+    public PGQueryException.ErrorDetails errorDetails;
 
     alias errorDetails this;
 
