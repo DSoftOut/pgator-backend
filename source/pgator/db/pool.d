@@ -44,11 +44,18 @@ class UnknownTransactionException : Exception
 
 class QueryProcessingException : Exception
 {
-    export PGQueryException.ErrorDetails errDetails;
+    PGQueryException.ErrorDetails errDetails;
 
     @safe pure nothrow this(string msg, string file = __FILE__, size_t line = __LINE__)
     {
         super(msg, file, line); 
+    }
+
+    @safe pure nothrow this(PGQueryException.ErrorDetails ed, string file = __FILE__, size_t line = __LINE__)
+    {
+        errDetails = ed;
+
+        super(ed.message, file, line);
     }
 }
 
