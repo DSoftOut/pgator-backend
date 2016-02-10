@@ -349,25 +349,13 @@ class CPGconn : IPGconn
         }
     }
     
-    /**
-    *   Prototype: PQsendQuery
-    *   Throws: PGQueryException
-    */
+    Answer answer;
+
     void sendQuery(string command)
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQsendQuery !is null, "DerelictPQ isn't loaded!");
+        answer == conn.sendQuery(command);
     }
-    body
-    {
-        auto res = PQsendQuery(conn, command.toStringz);
-        if (res == 0)
-        {
-            throw new PGQueryException(errorMessage);
-        }
-    }
-    
+
     /**
     *   Like sendQueryParams but uses libpq escaping functions
     *   and sendQuery. 
