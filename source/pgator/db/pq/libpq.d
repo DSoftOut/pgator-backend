@@ -325,7 +325,7 @@ class CPGconn : IPGconn
     */
     shared(IPGresult) getResult()
     {
-        immutable (Answer) r = conn.getAnswer();
+        auto r = conn.getAnswer();
 
         if(r is null) return null;
 
