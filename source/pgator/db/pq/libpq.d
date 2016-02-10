@@ -294,61 +294,6 @@ class CPGconn : IPGconn
     {
         return conn.errorMessage();
     }
-    /+
-    /**
-    *   Prototype: PQsendQueryParams
-    *   Note: This is simplified version of the command that
-    *         handles only string params.
-    *   Throws: PGQueryException
-    */
-    void sendQueryParams(string command, string[] paramValues)
-    in
-    {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQsendQueryParams !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        const (ubyte)** toPlainArray(string[] arr)
-        {
-            auto ptrs = new char*[arr.length];
-            foreach(i, ref p; ptrs)
-            {
-                // special case to handle SQL null values
-                if(arr[i] is null)
-                {
-                    p = null;
-                }
-                else
-                {
-                    p = cast(char*) arr[i].toStringz;
-                }
-            }
-            return cast(const(ubyte)**)ptrs.ptr;
-        }
-        
-        const(int)* genFormatArray(string[] params)
-        {
-            auto formats = new int[params.length];
-            foreach(i, p; params)
-            {
-                if(p is null)
-                {
-                    formats[i] = 1;
-                }
-            }
-            return formats.ptr;
-        }
-        
-        // type error in bindings int -> size_t, const(char)* -> const(char*), const(ubyte)** -> const(ubyte**)
-        auto res = PQsendQueryParams(conn, command.toStringz, cast(int)paramValues.length, null
-            , toPlainArray(paramValues), null, null, 1);
-        if (res == 0)
-        {
-            throw new PGQueryException(errorMessage);
-        }
-    }
-    +/
 
     void sendQuery(string command)
     {
