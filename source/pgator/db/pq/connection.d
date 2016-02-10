@@ -20,6 +20,8 @@ import std.range;
 import std.datetime;
 import vibe.data.bson;
 
+alias Dpq2ConnectException = ConnException;
+
 /**
 *   PostgreSQL specific connection type. Although it can use
 *   different data base backend, the class is defined to 
@@ -50,7 +52,7 @@ synchronized class PQConnection : IConnection
             lastConnString = connString;
             
             initNoticeCallbacks();
-        } catch(PGException e)
+        } catch(Dpq2ConnectException e)
         {
             logger.logError(text("Failed to connect to SQL server, reason:", e.msg));
             throw new ConnectException(server, e.msg);
@@ -82,7 +84,7 @@ synchronized class PQConnection : IConnection
             reconnecting = false;
             
             initNoticeCallbacks();
-        } catch(PGReconnectException e)
+        } catch(Dpq2ConnectException e)
         {
             logger.logError(text("Failed to reconnect to SQL server, reason:", e.msg));
             throw new ConnectException(server, e.msg);
@@ -165,7 +167,7 @@ synchronized class PQConnection : IConnection
     body
     {
         try conn.sendQueryParams(com, params);
-        catch (PGQueryException e)
+        catch (ConnException e)
         {
             throw new QueryException(e.msg);
         }
@@ -309,20 +311,13 @@ synchronized class PQConnection : IConnection
     */
     TimestampFormat timestampFormat() @property
     {
-        try
+        auto res = conn.parameterStatus("integer_datetimes");
+        if(res == "on")
         {
-            auto res = conn.parameterStatus("integer_datetimes");
-            if(res == "on")
-            {
-                return TimestampFormat.Int64;
-            } else
-            {
-                return TimestampFormat.Float8;
-            }
-        } catch(PGParamNotExistException e)
+            return TimestampFormat.Int64;
+        } else
         {
-            logger.logInfo(text("Server doesn't support '", e.param,"' parameter! Assume HAVE_INT64_TIMESTAMP."));
-            return TimestampFormat.Int64; 
+            return TimestampFormat.Float8;
         }
     }
     
@@ -336,24 +331,9 @@ synchronized class PQConnection : IConnection
     */
     immutable(TimeZone) timeZone() @property
     {
-        try
-        {
             auto res = conn.parameterStatus("TimeZone");
 
-            try
-            {
-                return TimeZone.getTimeZone(res);
-            } catch(DateTimeException e)
-            {
-                logger.logInfo(text("Cannot parse time zone value '", res, "'. Assume UTC."));
-                return UTC();
-            }
-
-        } catch(PGParamNotExistException e)
-        {
-            logger.logInfo(text("Server doesn't support '", e.param,"' parameter! Assume UTC."));
-            return UTC(); 
-        }
+            return TimeZone.getTimeZone(res);
     }
     
     /**
