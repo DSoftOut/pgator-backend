@@ -294,7 +294,7 @@ class CPGconn : IPGconn
     {
         return conn.errorMessage();
     }
-    
+    /+
     /**
     *   Prototype: PQsendQueryParams
     *   Note: This is simplified version of the command that
@@ -348,34 +348,28 @@ class CPGconn : IPGconn
             throw new PGQueryException(errorMessage);
         }
     }
-    
-    Answer answer;
+    +/
 
     void sendQuery(string command)
     {
-        answer == conn.sendQuery(command);
+        conn.sendQuery(command);
     }
 
-    /**
-    *   Like sendQueryParams but uses libpq escaping functions
-    *   and sendQuery. 
-    *   
-    *   The main advantage of the function is ability to handle
-    *   multiple SQL commands in one query.
-    *   Throws: PGQueryException
-    */
     void sendQueryParamsExt(string command, string[] paramValues)
     {
-        try
+        QueryParams params;
+        params.sqlCommand = command;
+        params.resultFormat = ValueFormat.BINARY;
+        params.args.length = paramValues.length;
+
+        foreach(i, ref p; params.args)
         {
-            sendQuery(escapeParams(command, paramValues));
+            p.value = paramValues[i];
         }
-        catch(PGEscapeException e)
-        {
-            throw new PGQueryException(e.msg);
-        }
+
+        conn.sendQuery(params);
     }
-    
+
     /**
     *   Prototype: PQgetResult
     *   Note: Even when PQresultStatus indicates a fatal error, 
@@ -384,17 +378,13 @@ class CPGconn : IPGconn
     *   Note: A null pointer is returned when the command is complete and t
     *         here will be no more results.
     */
-    shared(IPGresult) getResult() nothrow
-    in
+    shared(IPGresult) getResult()
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQgetResult !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        auto res = PQgetResult(conn);
-        if(res is null) return null;
-        return new shared CPGresult(res, logger);
+        immutable (Answer) r = conn.getAnswer();
+
+        if(r is null) return null;
+
+        return new shared CPGresult(r, logger);
     }
 
     void consumeInput()
