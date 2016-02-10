@@ -277,27 +277,7 @@ interface IPGconn
     *   Prototype: PQresetPoll
     */
     PostgresPollingStatusType resetPoll() nothrow;
-    
-    /**
-    *   Prototype: PQhost
-    */
-    string host() const nothrow @property;
 
-    /**
-    *   Prototype: PQdb
-    */
-    string db() const nothrow @property;
-
-    /**
-    *   Prototype: PQuser
-    */
-    string user() const nothrow @property;
-    
-    /**
-    *   Prototype: PQport
-    */
-    string port() const nothrow @property;
-    
     /**
     *   Prototype: PQerrorMessage
     */
@@ -375,6 +355,8 @@ interface IPGconn
     
     /// Getting local logger
     protected shared(ILogger) logger() nothrow;
+
+    string server() nothrow;
 }
 
 /**

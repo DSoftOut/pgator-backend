@@ -239,14 +239,20 @@ synchronized class CPGresult : IPGresult
     }
 }
 
-class CPGconn : IPGconn
+synchronized class CPGconn : IPGconn
 {
-    private Dpq2Connection conn;    
+    private Dpq2Connection sharedConn;    
     private shared(ILogger) mLogger;
+
+    @property
+    Dpq2Connection conn() const nothrow // nonshared conn for compatibility with dpq2
+    {
+        return cast(Dpq2Connection) sharedConn;
+    }
 
     this(Dpq2Connection conn, shared ILogger plogger) nothrow
     {
-        this.conn = conn;
+        this.sharedConn = cast(shared) conn;
         this.mLogger = plogger;
     }
 
@@ -325,11 +331,12 @@ class CPGconn : IPGconn
     */
     shared(IPGresult) getResult()
     {
-        auto r = conn.getAnswer();
+        return null;
+        //auto r = conn.getAnswer(); //FIXME
 
-        if(r is null) return null;
+        //if(r is null) return null;
 
-        return new shared CPGresult(r, logger);
+        //return new shared CPGresult(r, logger);
     }
 
     void consumeInput()
@@ -376,6 +383,11 @@ class CPGconn : IPGconn
     PQnoticeProcessor setNoticeProcessor(PQnoticeProcessor proc, void* arg) nothrow
     {
         return conn.setNoticeProcessor(proc, arg);
+    }
+
+    string server()
+    {
+        return conn.host;
     }
 }
 

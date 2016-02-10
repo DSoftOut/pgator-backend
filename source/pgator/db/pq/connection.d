@@ -283,7 +283,7 @@ synchronized class PQConnection : IConnection
     {
         scope(failure) return "";
         
-        return conn.host;
+        return (cast(shared) conn).server();
     }
     
     /**
