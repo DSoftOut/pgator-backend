@@ -329,8 +329,7 @@ synchronized class CPGconn : IPGconn
     */
     shared(IPGresult) getResult()
     {
-        //return null;
-        auto r = conn.getAnswer(); //FIXME
+        auto r = conn.getAnswer();
 
         if(r is null) return null;
 

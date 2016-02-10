@@ -174,7 +174,7 @@ synchronized class PQConnection : IConnection
     /**
     *   Returns quering status of connection.
     */
-    QueringStatus pollQueringStatus() nothrow
+    QueringStatus pollQueringStatus()
     in
     {
         assert(conn !is null, "Connection start wasn't established!");

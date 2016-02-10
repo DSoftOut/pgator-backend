@@ -318,7 +318,7 @@ interface IPGconn
     *   Note: A null pointer is returned when the command is complete and t
     *         here will be no more results.
     */
-    shared(IPGresult) getResult() nothrow;
+    shared(IPGresult) getResult();
     
     /**
     *   Prototype: PQconsumeInput

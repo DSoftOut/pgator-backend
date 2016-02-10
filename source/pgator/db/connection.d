@@ -199,7 +199,7 @@ interface IConnection
     /**
     *   Returns quering status of connection.
     */
-    QueringStatus pollQueringStatus() nothrow;
+    QueringStatus pollQueringStatus();
     
     /**
     *   If quering process is ended with error state, then
