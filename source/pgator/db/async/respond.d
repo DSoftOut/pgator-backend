@@ -45,8 +45,8 @@ struct Respond
         bool localSucc = true;
         foreach(res; results)
         {
-            if( res.resultStatus != ExecStatusType.PGRES_TUPLES_OK &&
-                res.resultStatus != ExecStatusType.PGRES_COMMAND_OK)
+            if( res.resultStatus != PGRES_TUPLES_OK &&
+                res.resultStatus != PGRES_COMMAND_OK)
             {
                 failed = true;
                 exception = res.resultErrorMessage;

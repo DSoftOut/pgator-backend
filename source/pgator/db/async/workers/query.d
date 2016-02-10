@@ -308,8 +308,8 @@ private class Element
                             bool failed = false;
                             foreach(res; resList)
                             {
-                                if(res.resultStatus != ExecStatusType.PGRES_TUPLES_OK &&
-                                   res.resultStatus != ExecStatusType.PGRES_COMMAND_OK)
+                                if(res.resultStatus != PGRES_TUPLES_OK &&
+                                   res.resultStatus != PGRES_COMMAND_OK)
                                 {
                                     respond = Respond(new QueryException(res.resultErrorMessage), conn);
                                     rollbackNeeded = true;  
