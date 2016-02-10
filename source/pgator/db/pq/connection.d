@@ -8,7 +8,7 @@
 */
 module pgator.db.pq.connection;
 
-import derelict.pq.pq;
+import dpq2.connection;
 import pgator.db.connection;
 import pgator.db.pq.api;
 import pgator.util.string;
@@ -106,20 +106,20 @@ synchronized class PQConnection : IConnection
         
         switch(val)
         {
-            case PostgresPollingStatusType.PGRES_POLLING_OK:
+            case PGRES_POLLING_OK:
             {
                 switch(conn.status)
                 {
-                    case(ConnStatusType.CONNECTION_OK):
+                    case(CONNECTION_OK):
                     {
                         return ConnectionStatus.Finished;
                     }
-                    case(ConnStatusType.CONNECTION_NEEDED):
+                    case(CONNECTION_NEEDED):
                     {
                         savedException = cast(shared)(new ConnectException(server, "Connection wasn't tried to be established!"));
                         return ConnectionStatus.Error;
                     }
-                    case(ConnStatusType.CONNECTION_BAD):
+                    case(CONNECTION_BAD):
                     {
                         savedException = cast(shared)(new ConnectException(server, conn.errorMessage));
                         return ConnectionStatus.Error;
@@ -130,7 +130,7 @@ synchronized class PQConnection : IConnection
                     }
                 }
             }
-            case PostgresPollingStatusType.PGRES_POLLING_FAILED:
+            case PGRES_POLLING_FAILED:
             {
                 savedException = cast(shared)(new ConnectException(server, conn.errorMessage));
                 return ConnectionStatus.Error;
@@ -394,16 +394,17 @@ synchronized class PQConnection : IConnection
         
         shared string[] mRaisedMsgs;
         
-        extern(C) static void noticeProcessor(void* arg, char* message) nothrow
+        extern(C) static void noticeProcessor(void* arg, char* message) nothrow @nogc
         {
             auto pqConn = cast(shared PQConnection)arg;
             if(!pqConn) return;
+            //FIXME: need logging here
             
-            try pqConn.addRaisedMsg(fromStringz(message).idup);
-            catch(Throwable e)
-            {
-                pqConn.logger.logError(text("Failed to add raised msg at libpq connection! Reason: ", e.msg));
-            }
+            //~ try pqConn.addRaisedMsg(fromStringz(message).idup);
+            //~ catch(Throwable e)
+            //~ {
+                //~ pqConn.logger.logError(text("Failed to add raised msg at libpq connection! Reason: ", e.msg));
+            //~ }
         }
         
         void initNoticeCallbacks()
