@@ -21,6 +21,7 @@ import std.conv;
 import core.memory;
 import core.exception: RangeError;
 
+alias Dpq2Connection = dpq2.Connection;
 //import util;
 
 synchronized class CPGresult : IPGresult
@@ -238,193 +239,60 @@ synchronized class CPGresult : IPGresult
     }
 }
 
-synchronized class CPGconn : IPGconn
+class CPGconn : IPGconn
 {
-    this(Connection conn, shared ILogger plogger) nothrow
+    private Dpq2Connection conn;    
+    private shared(ILogger) mLogger;
+
+    this(Dpq2Connection conn, shared ILogger plogger) nothrow
     {
-        this.mConn = cast(shared)conn;
+        this.conn = conn;
         this.mLogger = plogger;
     }
-    
-    private shared Connection mConn;
-    
-    private PGconn* conn() const nothrow
-    {
-        return cast(PGconn*)mConn;
-    }
-    
-    private shared(ILogger) mLogger;
-    
+
     protected shared(ILogger) logger() nothrow
     {
         return mLogger;
     }
-    
-    /**
-    *   Prototype: PQconnectPoll
-    */
+
     PostgresPollingStatusType poll() nothrow
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQconnectPoll !is null, "DerelictPQ isn't loaded!");
+        return conn.poll;
     }
-    body
-    {
-        return PQconnectPoll(conn);
-    }
-    
-    /**
-    *   Prototype: PQstatus
-    */
+
     ConnStatusType status() nothrow
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQstatus !is null, "DerelictPQ isn't loaded!");
+        return conn.status;
     }
-    body
-    {
-        return PQstatus(conn);
-    }
-    
+
     /**
     *   Prototype: PQfinish
     *   Note: this function should be called even
     *   there was an error.
     */
     void finish() nothrow
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQfinish !is null, "DerelictPQ isn't loaded!");
+        conn.disconnect();
     }
-    body
-    {
-        scope(failure) {}
 
-        PQfinish(conn);
-        mConn = null;
-    }
-    
-    /**
-    *   Prototype: PQflush
-    */
     bool flush() nothrow const
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQfinish !is null, "DerelictPQ isn't loaded!");
+        return flush();
     }
-    body
-    {
-        return PQflush(conn) != 0;
-    }
-    
-    /**
-    *   Prototype: PQresetStart
-    *   Throws: PGReconnectException
-    */
+
     void resetStart()
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQresetStart !is null, "DerelictPQ isn't loaded!");
+        conn.resetStart();
     }
-    body
-    {
-        auto res = PQresetStart(conn);
-        if(res == 1)
-            throw new PGReconnectException(errorMessage);
-    }
-    
-    /**
-    *   Prototype: PQresetPoll
-    */
+
     PostgresPollingStatusType resetPoll() nothrow
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQresetPoll !is null, "DerelictPQ isn't loaded!");
+        return conn.resetPoll();
     }
-    body
-    {
-        return PQresetPoll(conn);
-    }
-    
-    /**
-    *   Prototype: PQhost
-    */
-    string host() const nothrow @property
-    in
-    {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQhost !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        scope(failure) return "";
-        return fromStringz(PQhost(conn)).idup;
-    }    
 
-    /**
-    *   Prototype: PQdb
-    */
-    string db() const nothrow @property
-    in
-    {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQdb !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        scope(failure) return "";
-        return fromStringz(PQdb(conn)).idup;
-    }     
-
-    /**
-    *   Prototype: PQuser
-    */
-    string user() const nothrow @property
-    in
-    {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQuser !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        scope(failure) return "";
-        return fromStringz(PQuser(conn)).idup;
-    } 
-    
-    /**
-    *   Prototype: PQport
-    */
-    string port() const nothrow @property
-    in
-    {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQport !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        scope(failure) return "";
-        return fromStringz(PQport(conn)).idup;
-    } 
-    
-    /**
-    *   Prototype: PQerrorMessage
-    */
     string errorMessage() const nothrow @property
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQerrorMessage !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        scope(failure) return "";
-        return fromStringz(PQerrorMessage(conn)).idup;
+        return conn.errorMessage();
     }
     
     /**
@@ -540,53 +408,24 @@ synchronized class CPGconn : IPGconn
         if(res is null) return null;
         return new shared CPGresult(res, logger);
     }
-    
-    /**
-    *   Prototype: PQconsumeInput
-    *   Throws: PGQueryException
-    */
+
     void consumeInput()
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQconsumeInput !is null, "DerelictPQ isn't loaded!");
+        conn.consumeInput();
     }
-    body
-    {
-        auto res = PQconsumeInput(conn);
-        if(res == 0) 
-            throw new PGQueryException(errorMessage);
-    }
-    
-    /**
-    *   Prototype: PQisBusy
-    */
+
     bool isBusy() nothrow
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQisBusy !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return PQisBusy(conn) > 0;
+        return conn.isBusy();
     }
     
     /**
     *   Prototype: PQescapeLiteral
     *   Throws: PGEscapeException
     */
-    string escapeLiteral(string msg) const
-    in
+    string escapeLiteral(string msg)
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQescapeLiteral !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        auto res = PQescapeLiteral(conn, msg.toStringz, msg.length);
-        if(res is null) throw new PGEscapeException(errorMessage);
-        return fromStringz(res).idup;
+        return conn.escapeLiteral(msg);
     }
     
     /**
@@ -602,53 +441,18 @@ synchronized class CPGconn : IPGconn
         }
         return query;
     }
-    
-    /**
-    *   Prototype: PQparameterStatus
-    *   Throws: PGParamNotExistException
-    */
-    string parameterStatus(string param) const
-    in
+
+    string parameterStatus(string param)
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQparameterStatus !is null, "DerelictPQ isn't loaded!");
+        return conn.parameterStatus(param);
     }
-    body
-    {
-        // fix bindings char* -> const char*
-        auto res = PQparameterStatus(conn, cast(char*)toStringz(param));
-        if(res is null)
-            throw new PGParamNotExistException(param);
-        
-        return res.fromStringz.idup;
-    }
-    
-    /**
-    *   Prototype: PQsetNoticeReceiver
-    */
-    PQnoticeReceiver setNoticeReceiver(PQnoticeReceiver proc, void* arg) nothrow
-    in
-    {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQsetNoticeReceiver !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return PQsetNoticeReceiver(conn, proc, arg);
-    }
-    
+
     /**
     *   Prototype: PQsetNoticeProcessor
     */
     PQnoticeProcessor setNoticeProcessor(PQnoticeProcessor proc, void* arg) nothrow
-    in
     {
-        assert(conn !is null, "PGconn was finished!");
-        assert(PQsetNoticeProcessor !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return PQsetNoticeProcessor(conn, proc, arg);
+        return conn.setNoticeProcessor(proc, arg);
     }
 }
 
