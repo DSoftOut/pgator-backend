@@ -335,18 +335,13 @@ interface IPGconn
     *   Prototype: PQescapeLiteral
     *   Throws: PGEscapeException
     */
-    string escapeLiteral(string msg) const;
+    string escapeLiteral(string msg);
     
     /**
     *   Prototype: PQparameterStatus
     *   Throws: PGParamNotExistException
     */
-    string parameterStatus(string param) const;
-    
-    /**
-    *   Prototype: PQsetNoticeReceiver
-    */
-    PQnoticeReceiver setNoticeReceiver(PQnoticeReceiver proc, void* arg) nothrow;
+    string parameterStatus(string param);
     
     /**
     *   Prototype: PQsetNoticeProcessor

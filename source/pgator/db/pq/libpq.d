@@ -306,7 +306,7 @@ synchronized class CPGconn : IPGconn
         conn.sendQuery(command);
     }
 
-    void sendQueryParamsExt(string command, string[] paramValues)
+    void sendQueryParams(string command, string[] paramValues)
     {
         QueryParams params;
         params.sqlCommand = command;
@@ -319,6 +319,19 @@ synchronized class CPGconn : IPGconn
         }
 
         conn.sendQuery(params);
+    }
+
+    /**
+    *   Like sendQueryParams but uses libpq escaping functions
+    *   and sendQuery. 
+    *   
+    *   The main advantage of the function is ability to handle
+    *   multiple SQL commands in one query.
+    *   Throws: PGQueryException
+    */
+    void sendQueryParamsExt(string command, string[] paramValues)
+    {
+        sendQuery(escapeParams(command, paramValues));
     }
 
     /**
