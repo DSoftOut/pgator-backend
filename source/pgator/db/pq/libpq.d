@@ -11,7 +11,7 @@
 module pgator.db.pq.libpq;
 
 public import pgator.db.pq.api;
-public import derelict.pq.pq;
+public import dpq2;
 import derelict.util.exception;
 import dlogg.log;
 import std.exception;
@@ -240,13 +240,13 @@ synchronized class CPGresult : IPGresult
 
 synchronized class CPGconn : IPGconn
 {
-    this(PGconn* conn, shared ILogger plogger) nothrow
+    this(Connection conn, shared ILogger plogger) nothrow
     {
         this.mConn = cast(shared)conn;
         this.mLogger = plogger;
     }
     
-    private shared PGconn* mConn;
+    private shared Connection mConn;
     
     private PGconn* conn() const nothrow
     {
@@ -673,6 +673,7 @@ synchronized class PostgreSQL : IPostgreSQL
     */
     void finalize() nothrow
     {
+        /*
         try
         {
         	GC.collect();
@@ -681,21 +682,16 @@ synchronized class PostgreSQL : IPostgreSQL
         {
         	
         }
+        */
     }
     
-    /**
-    *   Prototype: PQconnectStart
-    *   Throws: PGMemoryLackException
-    */
     shared(IPGconn) startConnect(string conninfo)
-    in
     {
-        assert(PQconnectStart !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        auto conn = enforceEx!PGMemoryLackException(PQconnectStart(cast(char*)conninfo.toStringz));
-        return new shared CPGconn(conn, logger);
+        auto c = new Connection;
+        c.connString = conninfo;
+        c.connectNonblockingStart();
+
+        return new shared CPGconn(c, logger);
     }
     
     /**
