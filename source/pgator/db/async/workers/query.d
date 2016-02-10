@@ -316,7 +316,7 @@ private class Element
                                     stage = Stage.MoreQueries;                         
                                     failed = true;
                                 }
-                                res.clear();
+                                //res.clear();
                             }
                             if(failed) return;
                         }

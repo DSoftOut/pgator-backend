@@ -204,14 +204,12 @@ synchronized class PQConnection : IConnection
         try
         {
             auto reses = execQuery("SELECT 'pgator_ping';");
-            foreach(res; reses)
-            {
-                res.clear();
-            }
-        } catch(Exception e)
+        }
+        catch(Exception e)
         {
             return false;
         }
+
         return true;
     }
     

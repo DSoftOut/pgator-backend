@@ -125,7 +125,7 @@ interface IPGresult
     /**
     *   Prototype: PQclear
     */
-    void clear() nothrow;
+    //void clear() nothrow;
     
     /**
     *   Prototype: PQntuples

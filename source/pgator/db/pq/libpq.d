@@ -26,13 +26,13 @@ alias Dpq2Connection = dpq2.Connection;
 
 synchronized class CPGresult : IPGresult
 {
-    this(PGresult* result, shared ILogger plogger) nothrow
+    this(immutable Answer result, shared ILogger plogger) nothrow
     {
-        this.mResult = cast(shared)result;
+        this.mResult = result;
         this.mLogger = plogger;
     }
     
-    private shared PGresult* mResult;
+    private immutable Answer mResult;
     
     private PGresult* result() nothrow const
     {
@@ -89,21 +89,6 @@ synchronized class CPGresult : IPGresult
     body
     {
         return fromStringz(PQresultErrorMessage(result)).idup;
-    }
-    
-    /**
-    *   Prototype: PQclear
-    */
-    void clear() nothrow
-    in
-    {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQclear !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        PQclear(result);
-        mResult = null;
     }
     
     /**
@@ -344,12 +329,12 @@ synchronized class CPGconn : IPGconn
     */
     shared(IPGresult) getResult()
     {
-        return null;
-        //auto r = conn.getAnswer(); //FIXME
+        //return null;
+        auto r = conn.getAnswer(); //FIXME
 
-        //if(r is null) return null;
+        if(r is null) return null;
 
-        //return new shared CPGresult(r, logger);
+        return new shared CPGresult(r, logger);
     }
 
     void consumeInput()

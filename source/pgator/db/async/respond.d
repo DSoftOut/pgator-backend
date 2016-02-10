@@ -66,7 +66,7 @@ struct Respond
                     result ~= temp;
                 }
             }
-            res.clear();
+            //res.clear();
         }
         return localSucc;
     }
