@@ -285,7 +285,6 @@ synchronized class PostgreSQL : IPostgreSQL
     this(shared ILogger plogger)
     {
         this.mLogger = plogger;
-        //initialize();
     }
 
     private shared(ILogger) mLogger;
@@ -294,26 +293,6 @@ synchronized class PostgreSQL : IPostgreSQL
     {
         return mLogger;
     }
-
-    /+
-    /**
-    *   Should be called to free libpq resources. The method
-    *   unloads library from application memory.
-    */
-    void finalize() nothrow
-    {
-        /*
-        try
-        {
-        	GC.collect();
-        	DerelictPQ.unload();
-    	} catch(Throwable th)
-        {
-        	
-        }
-        */
-    }
-    +/
     
     shared(IPGconn) startConnect(string conninfo)
     {
@@ -323,55 +302,4 @@ synchronized class PostgreSQL : IPostgreSQL
 
         return new shared CPGconn(c, logger);
     }
-
-    /+
-    /**
-    *   Prototype: PQping
-    */
-    PGPing ping(string conninfo) nothrow
-    in
-    {
-        assert(PQping !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return PQping(cast(char*)conninfo.toStringz);
-    }
-
-    protected
-    {
-        /**
-        *   Should be called in class constructor. The method
-        *   loads library in memory.
-        */
-        void initialize()
-        {
-            try
-            {
-                version(linux)
-                {
-                    try
-                    {
-                        DerelictPQ.load();
-                    } catch(DerelictException e)
-                    {
-                        // try with some frequently names
-                        DerelictPQ.load("libpq.so.0,libpq.so.5");
-                    }
-                }
-                else
-                {
-                    DerelictPQ.load();
-                }
-            } catch(SymbolLoadException e)
-            {
-                if( e.symbolName != "PQconninfo" &&
-                    e.symbolName != "PQsetSingleRowMode")
-                {
-                    throw e;
-                }
-            }
-        }
-    }
-    +/
 }

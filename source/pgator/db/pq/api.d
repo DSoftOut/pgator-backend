@@ -228,29 +228,4 @@ shared interface IPostgreSQL
     *   Throws: PGMemoryLackException
     */
     shared(IPGconn) startConnect(string conninfo);
-    
-    /+
-    /**
-    *   Prototype: PQping
-    */
-    PGPing ping(string conninfo) nothrow;
-    
-    /**
-    *   Should be called to free libpq resources. The method
-    *   unloads library from application memory.
-    */
-    void finalize() nothrow;
-
-    protected
-    {
-        /**
-        *   Should be called in class constructor. The method
-        *   loads library in memory.
-        */
-        void initialize();
-        
-        /// Getting local logger
-        shared(ILogger) logger() nothrow;
-    }
-    +/
 }
