@@ -122,7 +122,7 @@ synchronized class CPGconn : IPGconn
     private shared(ILogger) mLogger;
 
     @property
-    Dpq2Connection conn() const nothrow // nonshared conn for compatibility with dpq2
+    private Dpq2Connection conn() const nothrow // nonshared conn for compatibility with dpq2
     {
         return cast(Dpq2Connection) sharedConn;
     }

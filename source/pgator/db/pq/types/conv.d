@@ -265,13 +265,13 @@ version(IntegrationTest2)
     
     void testConvertions(shared ILogger logger, shared IConnectionPool pool)
     {
-        foreach(t; __traits(allMembers, PQType))
-        {
-            enum type = mixin("PQType."~t);
-            static if(!nonConvertable(type)) 
-            {
-                test!type(logger, pool);
-            }
-        }
+        //~ foreach(t; __traits(allMembers, PQType))
+        //~ {
+            //~ enum type = mixin("PQType."~t);
+            //~ static if(!nonConvertable(type)) 
+            //~ {
+                //~ test!type(logger, pool);
+            //~ }
+        //~ }
     }
 }
