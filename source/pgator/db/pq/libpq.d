@@ -11,9 +11,11 @@
 module pgator.db.pq.libpq;
 
 public import pgator.db.pq.api;
+import pgator.db.connection;
 public import dpq2;
 import derelict.util.exception;
 import dlogg.log;
+import vibe.data.bson;
 import std.exception;
 import std.string;
 import std.regex;
@@ -26,14 +28,31 @@ alias Dpq2Connection = dpq2.Connection;
 
 synchronized class CPGresult : IPGresult
 {
+    private immutable Answer mResult;
+
     this(immutable Answer result, shared ILogger plogger) nothrow
     {
         this.mResult = result;
         this.mLogger = plogger;
     }
-    
-    private immutable Answer mResult;
-    
+
+    Bson asColumnBson(shared IConnection conn) const
+    {
+        Bson[string] fields;
+        foreach(i; 0..mResult.columnCount)
+        {
+            Bson[] rows;
+            foreach(j; 0..mResult.length)
+            {
+                rows ~= mResult[j][i].toBson;
+            }
+
+            fields[mResult.columnName(i)] = Bson(rows);
+        }
+
+        return Bson(fields);
+    }
+
     private PGresult* result() nothrow const
     {
         return cast(PGresult*)mResult;
@@ -212,15 +231,9 @@ synchronized class CPGresult : IPGresult
     /**
     *   Prototype: PQftype
     */
-    PQType ftype(size_t colNumber) const
-    in
+    OidType ftype(size_t colNumber) const
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQftype !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return cast(PQType)PQftype(result, cast(uint)colNumber);
+        return mResult.OID(colNumber);
     }
 }
 

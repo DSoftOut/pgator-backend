@@ -14,7 +14,7 @@
 */
 module pgator.db.pq.api;
 
-import derelict.pq.pq;
+import dpq2.answer;
 public import pgator.db.pq.types.oids;
 import pgator.db.connection;
 import pgator.db.pq.types.conv;
@@ -93,69 +93,14 @@ interface IPGresult
     /**
     *   Prototype: PQftype
     */
-    PQType ftype(size_t colNumber) const;
+    OidType ftype(size_t colNumber) const;
     
     /**
     *   Creates Bson from result in column echelon order.
     *   
     *   Bson consists of named arrays of column values.
     */
-    final Bson asColumnBson(shared IConnection conn)
-    {
-        Bson[string] fields;
-        foreach(i; 0..nfields)
-        {
-            Bson[] rows;
-            foreach(j; 0..ntuples)
-            {
-                if(getisnull(j, i))
-                {
-                    rows ~= Bson(null);
-                }
-                else
-                {
-                    rows ~= pqToBson(ftype(i), asBytes(j, i), conn, logger);
-                }
-            }
-            fields[fname(i)] = Bson(rows);
-        }
-        
-        return Bson(fields);
-    }
-    
-    /**
-    * Creates Bson from result in row echelon order. 
-    *
-    * Each row in result is represented as structure with column fields.
-    *
-    * Authors: Zaramzan <shamyan.roman@gmail.com>
-    */
-    final Bson asRowBson(shared IConnection conn)
-    {
-    	Bson[] arr = new Bson[0];
-    	
-    	foreach(i; 0..ntuples)
-    	{
-    		Bson[string] entry;
-    		
-    		foreach(j; 0..nfields)
-    		{
-    		    if(getisnull(i, j))
-    		    {
-    		        entry[fname(j)] = Bson(null);
-    		    }
-    		    else
-    		    {
-    		        entry[fname(j)] = pqToBson(ftype(j), asBytes(i, j), conn, logger);
-		        }	
-    		}
-    		
-    		arr ~= Bson(entry);
-    	}
-    	
-    	return Bson(arr);
-    	
-    }
+    Bson asColumnBson(shared IConnection conn) const;
     
     /// Getting local logger
     protected shared(ILogger) logger() nothrow;
