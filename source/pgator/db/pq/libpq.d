@@ -285,7 +285,7 @@ synchronized class PostgreSQL : IPostgreSQL
     this(shared ILogger plogger)
     {
         this.mLogger = plogger;
-        initialize();
+        //initialize();
     }
 
     private shared(ILogger) mLogger;
@@ -294,7 +294,8 @@ synchronized class PostgreSQL : IPostgreSQL
     {
         return mLogger;
     }
-    
+
+    /+
     /**
     *   Should be called to free libpq resources. The method
     *   unloads library from application memory.
@@ -312,6 +313,7 @@ synchronized class PostgreSQL : IPostgreSQL
         }
         */
     }
+    +/
     
     shared(IPGconn) startConnect(string conninfo)
     {
@@ -334,7 +336,7 @@ synchronized class PostgreSQL : IPostgreSQL
     {
         return PQping(cast(char*)conninfo.toStringz);
     }
-    
+    /+
     protected
     {
         /**
@@ -370,4 +372,5 @@ synchronized class PostgreSQL : IPostgreSQL
             }
         }
     }
+    +/
 }

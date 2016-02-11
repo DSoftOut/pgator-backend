@@ -234,12 +234,13 @@ shared interface IPostgreSQL
     */
     PGPing ping(string conninfo) nothrow;
     
+    /+
     /**
     *   Should be called to free libpq resources. The method
     *   unloads library from application memory.
     */
     void finalize() nothrow;
-    
+
     protected
     {
         /**
@@ -251,4 +252,5 @@ shared interface IPostgreSQL
         /// Getting local logger
         shared(ILogger) logger() nothrow;
     }
+    +/
 }
