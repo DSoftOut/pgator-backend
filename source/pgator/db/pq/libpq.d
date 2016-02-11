@@ -323,7 +323,8 @@ synchronized class PostgreSQL : IPostgreSQL
 
         return new shared CPGconn(c, logger);
     }
-    
+
+    /+
     /**
     *   Prototype: PQping
     */
@@ -336,7 +337,7 @@ synchronized class PostgreSQL : IPostgreSQL
     {
         return PQping(cast(char*)conninfo.toStringz);
     }
-    /+
+
     protected
     {
         /**
