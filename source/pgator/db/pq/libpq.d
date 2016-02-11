@@ -28,209 +28,88 @@ alias Dpq2Connection = dpq2.Connection;
 
 synchronized class CPGresult : IPGresult
 {
-    private immutable Answer mResult;
+    private immutable Answer result;
 
     this(immutable Answer result, shared ILogger plogger) nothrow
     {
-        this.mResult = result;
+        this.result = result;
         this.mLogger = plogger;
     }
 
     Bson asColumnBson(shared IConnection conn) const
     {
         Bson[string] fields;
-        foreach(i; 0..mResult.columnCount)
+        foreach(i; 0..result.columnCount)
         {
             Bson[] rows;
-            foreach(j; 0..mResult.length)
+            foreach(j; 0..result.length)
             {
-                rows ~= mResult[j][i].toBson;
+                rows ~= result[j][i].toBson;
             }
 
-            fields[mResult.columnName(i)] = Bson(rows);
+            fields[result.columnName(i)] = Bson(rows);
         }
 
         return Bson(fields);
     }
 
-    private PGresult* result() nothrow const
-    {
-        return cast(PGresult*)mResult;
-    }
-    
     private shared(ILogger) mLogger;
     
     protected shared(ILogger) logger()
     {
         return mLogger;
     }
-    
-    /**
-    *   Prototype: PQresultStatus
-    */
+
     ExecStatusType resultStatus() nothrow const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQresultStatus !is null, "DerelictPQ isn't loaded!");
+        return result.status;
     }
-    body
-    {
-        return PQresultStatus(result);
-    }
-    
-    /**
-    *   Prototype: PQresStatus
-    *   Note: same as resultStatus, but converts 
-    *         the enum to human-readable string.
-    */
+
     string resStatus() const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQresultStatus !is null, "DerelictPQ isn't loaded!");
-        assert(PQresStatus !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-    	return fromStringz(PQresStatus(PQresultStatus(result))).idup;
+        return result.statusString;
     }
     
-    /**
-    *   Prototype: PQresultErrorMessage
-    */
     string resultErrorMessage() const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQresultErrorMessage !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return fromStringz(PQresultErrorMessage(result)).idup;
+        return result.resultErrorMessage;
     }
     
-    /**
-    *   Prototype: PQntuples
-    */
     size_t ntuples() nothrow const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQntuples !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return cast(size_t)PQntuples(result);
+        return result.length;
     }
     
-    /**
-    *   Prototype: PQnfields
-    */
     size_t nfields() nothrow const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQnfields !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return cast(size_t)PQnfields(result);
+        return result.columnCount;
     }
     
-    /**
-    *   Prototype: PQfname
-    */ 
     string fname(size_t colNumber) const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQfname !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return enforceEx!Error(fromStringz(PQfname(result, cast(uint)colNumber)).idup);
+        return result.columnName(colNumber);
     }
     
-    /**
-    *   Prototype: PQfformat
-    */
     bool isBinary(size_t colNumber) const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQfformat !is null, "DerelictPQ isn't loaded!");
+        return result.columnFormat(colNumber) == ValueFormat.BINARY;
     }
-    body
-    {
-        return PQfformat(result, cast(uint)colNumber) == 1;
-    }
-    
-    /**
-    *   Prototype: PQgetvalue
-    */
+
     string asString(size_t rowNumber, size_t colNumber) const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQgetvalue !is null, "DerelictPQ isn't loaded!");
+        return result[rowNumber][colNumber].as!string;
     }
-    body
-    {
-        import std.stdio; writeln(getLength(rowNumber, colNumber));
-        return fromStringz(cast(immutable(char)*)PQgetvalue(result, cast(uint)rowNumber, cast(uint)colNumber));
-    }
-    
-    /**
-    *   Prototype: PQgetvalue
-    */
+
     ubyte[] asBytes(size_t rowNumber, size_t colNumber) const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQgetvalue !is null, "DerelictPQ isn't loaded!");
+        return result[rowNumber][colNumber].as!(ubyte[]);
     }
-    body
-    {
-        auto l = getLength(rowNumber, colNumber);
-        auto res = new ubyte[l];
-        auto bytes = PQgetvalue(result, cast(uint)rowNumber, cast(uint)colNumber);
-        foreach(i; 0..l)
-            res[i] = bytes[i];
-        return res;
-    }
-    
-    /**
-    *   Prototype: PQgetisnull
-    */
+
     bool getisnull(size_t rowNumber, size_t colNumber) const
-    in
     {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQgetisnull !is null, "DerelictPQ isn't loaded!");
+        result[rowNumber].isNULL(colNumber);
     }
-    body
-    {
-        return PQgetisnull(result, cast(uint)rowNumber, cast(uint)colNumber) != 0;
-    }
-    
-    /**
-    *   Prototype: PQgetlength
-    */
-    size_t getLength(size_t rowNumber, size_t colNumber) const
-    in
-    {
-        assert(result !is null, "PGconn was finished!");
-        assert(PQgetisnull !is null, "DerelictPQ isn't loaded!");
-    }
-    body
-    {
-        return cast(size_t)PQgetlength(result, cast(uint)rowNumber, cast(uint)colNumber);
-    }
-    
-    /**
-    *   Prototype: PQftype
-    */
+
     OidType ftype(size_t colNumber) const
     {
         return mResult.OID(colNumber);
