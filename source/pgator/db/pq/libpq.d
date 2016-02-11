@@ -102,17 +102,17 @@ synchronized class CPGresult : IPGresult
 
     ubyte[] asBytes(size_t rowNumber, size_t colNumber) const
     {
-        return result[rowNumber][colNumber].as!(ubyte[]);
+        return result[rowNumber][colNumber].as!PGbytea.dup;
     }
 
     bool getisnull(size_t rowNumber, size_t colNumber) const
     {
-        result[rowNumber].isNULL(colNumber);
+        return result[rowNumber].isNULL(colNumber);
     }
 
     OidType ftype(size_t colNumber) const
     {
-        return mResult.OID(colNumber);
+        return result.OID(colNumber);
     }
 }
 

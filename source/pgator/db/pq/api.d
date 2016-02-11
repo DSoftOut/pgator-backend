@@ -86,11 +86,6 @@ interface IPGresult
     bool getisnull(size_t rowNumber, size_t colNumber) const;
     
     /**
-    *   Prototype: PQgetlength
-    */
-    size_t getLength(size_t rowNumber, size_t colNumber) const;
-    
-    /**
     *   Prototype: PQftype
     */
     OidType ftype(size_t colNumber) const;
