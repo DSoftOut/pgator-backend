@@ -201,13 +201,13 @@ synchronized class PQConnection : IConnection
     *   actually alive (e.g. nothing can detect fail after postgresql restart but
     *   query).
     */    
-    bool testAlive() nothrow
+    bool testAlive()
     {
         try
         {
-            auto reses = execQuery("SELECT 'pgator_ping';");
+            execQuery("SELECT 'pgator_ping';");
         }
-        catch(Exception e)
+        catch(Dpq2ConnectException e)
         {
             return false;
         }

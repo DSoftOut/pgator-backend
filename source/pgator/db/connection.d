@@ -263,7 +263,7 @@ interface IConnection
     *   actually alive (e.g. nothing can detect fail after postgresql restart but
     *   query).
     */
-    bool testAlive() nothrow;
+    bool testAlive();
     
     /**
     *   Blocking wrapper to one-command query execution.
