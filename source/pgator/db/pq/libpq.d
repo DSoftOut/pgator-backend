@@ -221,11 +221,13 @@ synchronized class CPGconn : IPGconn
     */
     shared(IPGresult) getResult()
     {
-        auto r = conn.getAnswer();
+        auto r = conn.getResult();
 
         if(r is null) return null;
 
-        return new shared CPGresult(r, logger);
+        auto a = r.getAnswer();
+
+        return new shared CPGresult(a, logger);
     }
 
     void consumeInput()
