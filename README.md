@@ -1,3 +1,4 @@
+(legacy, isn't supported)
 [![Build Status](https://travis-ci.org/DSoftOut/pgator-backend.svg?branch=master)](https://travis-ci.org/DSoftOut/pgator-backend)
 
 pgator-backend
